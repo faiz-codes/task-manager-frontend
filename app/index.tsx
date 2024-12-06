@@ -64,6 +64,13 @@ const index = () => {
         >
           <ButtonText>Profile</ButtonText>
         </Button>
+        <Button
+          onPress={() => {
+            router.push("task/list");
+          }}
+        >
+          <ButtonText>Task Manager</ButtonText>
+        </Button>
       </VStack>
     </SafeAreaView>
   );
