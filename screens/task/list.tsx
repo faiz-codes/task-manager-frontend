@@ -17,7 +17,7 @@ import React, { useState } from "react";
 import { Input, InputField } from "@/components/ui/input";
 import { ADD_TASK, COMPLETE_TASK } from "@/graphql/mutations";
 import { Textarea, TextareaInput } from "@/components/ui/textarea";
-import { formatDate } from "@/util";
+import { formatDate, handleSignOut } from "@/util";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import Toast from "react-native-root-toast";
 
@@ -38,7 +38,7 @@ const MainContent = () => {
   const [addTask] = useMutation(ADD_TASK);
   const [completeTask] = useMutation(COMPLETE_TASK);
 
-  const handleAddTask = () => {
+  const handleAddTask = async () => {
     addTask({
       variables: {
         title,
@@ -89,9 +89,17 @@ const MainContent = () => {
         className="flex-1 mb-20 md:mb-2"
       >
         <VStack className="p-4 pb-0 md:px-10 md:pt-6  w-full" space="2xl">
-          <Heading size="2xl" className="font-roboto">
-            Tasks
-          </Heading>
+          <HStack className="flex justify-between items-center w-full">
+            <Heading size="2xl" className="font-roboto">
+              Tasks
+            </Heading>
+
+            <Button variant="link" action="negative" onPress={handleSignOut}>
+              <ButtonText style={{ textDecorationLine: "underline" }}>
+                Sign Out
+              </ButtonText>
+            </Button>
+          </HStack>
 
           <GridItem
             _extra={{

@@ -12,8 +12,14 @@ import { GluestackUIProvider } from "@/components/ui/gluestack-ui-provider";
 import { useColorScheme } from "@/components/useColorScheme";
 import "../global.css";
 import { ApolloProvider } from "@apollo/client";
-import client from "@/graphql/client";
 import { RootSiblingParent } from "react-native-root-siblings";
+import SuperTokens from "supertokens-react-native";
+import client from "@/graphql/client";
+
+SuperTokens.init({
+  apiDomain: "http://localhost:4000",
+  apiBasePath: "/auth",
+});
 
 export {
   // Catch any errors thrown by the Layout component.

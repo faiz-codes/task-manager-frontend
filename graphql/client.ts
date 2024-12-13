@@ -3,11 +3,15 @@ import {
   InMemoryCache,
   ApolloLink,
   HttpLink,
+  createHttpLink,
 } from "@apollo/client";
+import { setContext } from "@apollo/client/link/context";
+import SuperTokens from "supertokens-react-native";
 
 // Create an HttpLink for GraphQL endpoint
-const httpLink = new HttpLink({ uri: "http://localhost:4000/graphql" });
-
+const httpLink = createHttpLink({
+  uri: "http://localhost:4000/graphql",
+});
 // Middleware to log requests and results
 const loggingLink = new ApolloLink((operation, forward) => {
   console.log(`[GraphQL Request] ${operation.operationName}`, {
@@ -34,13 +38,29 @@ const errorLink = new ApolloLink((operation, forward) => {
   });
 });
 
+const authLink = setContext(async (_, { headers }) => {
+  try {
+    const session = await SuperTokens.getAccessToken();
+
+    return {
+      headers: {
+        ...headers,
+        authorization: session ? `Bearer ${session}` : "", // Set token if available
+      },
+    };
+  } catch (error) {
+    console.error("Error retrieving access token:", error);
+    return { headers };
+  }
+});
+
 // Combine links
 const link = ApolloLink.from([loggingLink, errorLink, httpLink]);
 
 // Initialize Apollo Client
 const client = new ApolloClient({
   cache: new InMemoryCache(),
-  link: link,
+  link: authLink.concat(link),
 });
 
 export default client;

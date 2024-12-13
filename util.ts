@@ -1,3 +1,6 @@
+import { router } from "expo-router";
+import SuperTokens from "supertokens-react-native";
+
 export function formatDate(
   dateStr: string,
   format: string = "DD Mon YYYY"
@@ -19,3 +22,73 @@ export function formatDate(
     .replace("DD", day)
     .replace("Mon", monthShortName);
 }
+
+export const signUp = async (email: string, password: string) => {
+  const response = await fetch("http://localhost:4000/auth/signup", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      formFields: [
+        {
+          id: "email",
+          value: email,
+        },
+        {
+          id: "password",
+          value: password,
+        },
+      ],
+    }),
+  });
+
+  console.log("sign up response", response);
+
+  if (response.status === 200) {
+    return true;
+  } else return false;
+};
+
+export const signIn = async (email: string, password: string) => {
+  if (await SuperTokens.doesSessionExist()) {
+    await SuperTokens.signOut();
+    console.log("signed out");
+  }
+
+  await fetch("http://localhost:4000/auth/signin", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      formFields: [
+        {
+          id: "email",
+          value: email,
+        },
+        {
+          id: "password",
+          value: password,
+        },
+      ],
+    }),
+  });
+
+  if (await SuperTokens.doesSessionExist()) {
+    await SuperTokens.attemptRefreshingSession();
+    return true;
+  }
+
+  return false;
+};
+
+export const doesSessionExist = async () => {
+  if (await SuperTokens.doesSessionExist()) {
+    console.log("session exist");
+    return true;
+  } else {
+    return false;
+  }
+};
+
+export const handleSignOut = async () => {
+  await SuperTokens.signOut();
+  router.push("/task/signin");
+};
